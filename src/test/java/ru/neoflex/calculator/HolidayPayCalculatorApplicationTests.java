@@ -13,17 +13,18 @@ import java.time.LocalDate;
 class HolidayPayCalculatorApplicationTests {
 
     @Test
-    @DisplayName("Вычисление отпускных 1")
-    void testCalculateHolidayPay1() {
+    @DisplayName("Вычисление отпускных по датам 1")
+    void testCalculateHolidayPayByDates1() {
         // given
         double averageSalary = 30000;
-        LocalDate vacationStartDate = LocalDate.of(2024, 7, 1);
-        LocalDate vacationEndDate = LocalDate.of(2024, 7, 14);
+        LocalDate holidayStartDate = LocalDate.of(2024, 7, 1);
+        LocalDate holidayEndDate = LocalDate.of(2024, 7, 14);
+        boolean isThereFiveWorkingDays = false;
         HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
 
         // when
         HolidayPayResponseDto holidayPayResponseDto =
-                holidayPayCalculatorService.calculateHolidayPay(averageSalary, vacationStartDate, vacationEndDate);
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, 0, holidayStartDate, holidayEndDate, isThereFiveWorkingDays);
 
         // then
         assertThat(holidayPayResponseDto.getVacationPay())
@@ -31,35 +32,37 @@ class HolidayPayCalculatorApplicationTests {
     }
 
     @Test
-    @DisplayName("Вычисление отпускных 2")
-    void testCalculateHolidayPay2() {
+    @DisplayName("Вычисление отпускных по датам 2")
+    void testCalculateHolidayPayByDates2() {
         // given
         double averageSalary = 40000;
-        LocalDate vacationStartDate = LocalDate.of(2024, 8, 10);
-        LocalDate vacationEndDate = LocalDate.of(2024, 8, 30);
+        LocalDate holidayStartDate = LocalDate.of(2024, 8, 10);
+        LocalDate holidayEndDate = LocalDate.of(2024, 8, 30);
+        boolean isThereFiveWorkingDays = true;
         HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
 
         // when
         HolidayPayResponseDto holidayPayResponseDto =
-                holidayPayCalculatorService.calculateHolidayPay(averageSalary, vacationStartDate, vacationEndDate);
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, 0, holidayStartDate, holidayEndDate, isThereFiveWorkingDays);
 
         // then
         assertThat(holidayPayResponseDto.getVacationPay())
-                .isEqualTo(32000);
+                .isEqualTo(38473.28);
     }
 
     @Test
-    @DisplayName("Вычисление отпускных 3")
-    void testCalculateHolidayPay3() {
+    @DisplayName("Вычисление отпускных по датам 3")
+    void testCalculateHolidayPayByDates3() {
         // given
         double averageSalary = 35000;
-        LocalDate vacationStartDate = LocalDate.of(2024, 7, 11);
-        LocalDate vacationEndDate = LocalDate.of(2024, 8, 2);
+        LocalDate holidayStartDate = LocalDate.of(2024, 7, 11);
+        LocalDate holidayEndDate = LocalDate.of(2024, 8, 2);
+        boolean isThereFiveWorkingDays = false;
         HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
 
         // when
         HolidayPayResponseDto holidayPayResponseDto =
-                holidayPayCalculatorService.calculateHolidayPay(averageSalary, vacationStartDate, vacationEndDate);
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, 0, holidayStartDate, holidayEndDate, isThereFiveWorkingDays);
 
         // then
         assertThat(holidayPayResponseDto.getVacationPay())
@@ -71,13 +74,14 @@ class HolidayPayCalculatorApplicationTests {
     void testNegativeAverageSalary() {
         // given
         double averageSalary = -35000;
-        LocalDate vacationStartDate = LocalDate.of(2024, 7, 11);
-        LocalDate vacationEndDate = LocalDate.of(2024, 8, 2);
+        LocalDate holidayStartDate = LocalDate.of(2024, 7, 11);
+        LocalDate holidayEndDate = LocalDate.of(2024, 8, 2);
+        boolean isThereFiveWorkingDays = true;
         HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
 
         // when
         HolidayPayResponseDto holidayPayResponseDto =
-                holidayPayCalculatorService.calculateHolidayPay(averageSalary, vacationStartDate, vacationEndDate);
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, 0, holidayStartDate, holidayEndDate, isThereFiveWorkingDays);
 
         // then
         assertThat(holidayPayResponseDto)
@@ -89,13 +93,14 @@ class HolidayPayCalculatorApplicationTests {
     void testWrongDates() {
         // given
         double averageSalary = 35000;
-        LocalDate vacationStartDate = LocalDate.of(2024, 8, 11);
-        LocalDate vacationEndDate = LocalDate.of(2024, 7, 2);
+        LocalDate holidayStartDate = LocalDate.of(2024, 8, 11);
+        LocalDate holidayEndDate = LocalDate.of(2024, 7, 2);
+        boolean isThereFiveWorkingDays = false;
         HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
 
         // when
         HolidayPayResponseDto holidayPayResponseDto =
-                holidayPayCalculatorService.calculateHolidayPay(averageSalary, vacationStartDate, vacationEndDate);
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, 0, holidayStartDate, holidayEndDate, isThereFiveWorkingDays);
 
         // then
         assertThat(holidayPayResponseDto)
@@ -103,17 +108,67 @@ class HolidayPayCalculatorApplicationTests {
     }
 
     @Test
-    @DisplayName("Даты равны null")
-    void testNullDates() {
+    @DisplayName("Вычисление отпускных по кол-ву дней 1")
+    void testCalculateHolidayPayByDaysNumber1() {
         // given
-        double averageSalary = 35000;
-        LocalDate vacationStartDate = null;
-        LocalDate vacationEndDate = null;
+        double averageSalary = 30000;
+        int holidayDays = 21;
         HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
 
         // when
         HolidayPayResponseDto holidayPayResponseDto =
-                holidayPayCalculatorService.calculateHolidayPay(averageSalary, vacationStartDate, vacationEndDate);
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, holidayDays, null, null, false);
+
+        // then
+        assertThat(holidayPayResponseDto.getVacationPay())
+                .isEqualTo(21501.71);
+    }
+
+    @Test
+    @DisplayName("Вычисление отпускных по кол-ву дней 2")
+    void testCalculateHolidayPayByDaysNumber2() {
+        // given
+        double averageSalary = 40000;
+        int holidayDays = 10;
+        HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
+
+        // when
+        HolidayPayResponseDto holidayPayResponseDto =
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, holidayDays, null, null, false);
+
+        // then
+        assertThat(holidayPayResponseDto.getVacationPay())
+                .isEqualTo(13651.88);
+    }
+
+    @Test
+    @DisplayName("Отрицательная ЗП")
+    void testNegativeAverageSalaryByDaysNumber() {
+        // given
+        double averageSalary = -35000;
+        int holidayDays = 10;
+        HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
+
+        // when
+        HolidayPayResponseDto holidayPayResponseDto =
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, holidayDays, null, null, false);
+
+        // then
+        assertThat(holidayPayResponseDto)
+                .isNull();
+    }
+
+    @Test
+    @DisplayName("Отрицательное кол-во дней отпуска")
+    void testNegativeDaysNumber() {
+        // given
+        double averageSalary = 35000;
+        int holidayDays = -10;
+        HolidayPayCalculatorService holidayPayCalculatorService = new HolidayPayCalculatorService();
+
+        // when
+        HolidayPayResponseDto holidayPayResponseDto =
+                holidayPayCalculatorService.calculateHolidayPay(averageSalary, holidayDays, null, null, false);
 
         // then
         assertThat(holidayPayResponseDto)

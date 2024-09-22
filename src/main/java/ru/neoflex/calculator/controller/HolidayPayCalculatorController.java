@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/holiday_pay")
+@RequestMapping("/api/holiday_pay_calculator")
 @AllArgsConstructor
 @CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
 public class HolidayPayCalculatorController {
@@ -19,10 +19,12 @@ public class HolidayPayCalculatorController {
 
     @GetMapping("/calculate")
     public ResponseEntity<HolidayPayResponseDto> calculateHolidayPay(@RequestParam double averageSalary,
-                                                                   @RequestParam LocalDate holidayStartDate,
-                                                                   @RequestParam LocalDate holidayEndDate) {
-        HolidayPayResponseDto holidayPayResponseDto = holidayPayCalculatorService.calculateHolidayPay(
-                averageSalary, holidayStartDate, holidayEndDate);
+                                                                                 @RequestParam int holidayDaysNumber,
+                                                                                 @RequestParam LocalDate holidayStartDate,
+                                                                                 @RequestParam LocalDate holidayEndDate,
+                                                                                 @RequestParam boolean isThereFiveWorkingDays) {
+        HolidayPayResponseDto holidayPayResponseDto = holidayPayCalculatorService.calculateHolidayPay(averageSalary,
+        holidayDaysNumber, holidayStartDate, holidayEndDate, isThereFiveWorkingDays);
 
         if (holidayPayResponseDto != null) {
             return new ResponseEntity<>(holidayPayResponseDto, HttpStatus.OK);

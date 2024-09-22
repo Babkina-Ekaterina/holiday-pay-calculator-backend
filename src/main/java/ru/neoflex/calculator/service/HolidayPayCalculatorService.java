@@ -10,11 +10,22 @@ import java.time.temporal.ChronoUnit;
 @Service
 @AllArgsConstructor
 public class HolidayPayCalculatorService {
+    private HolidayPayResponseDto calculateHolidayPayByDaysNumber(double averageSalary,
+                                                                 int holidayDaysNumber) {
+        if (averageSalary <= 0 || holidayDaysNumber <= 0) {
+            return null;
+        }
 
-    public HolidayPayResponseDto calculateHolidayPay(double averageSalary,
+        double holidayPay = Math.round((averageSalary / 29.3 * holidayDaysNumber) * 100.0) / 100.0;
+
+        return new HolidayPayResponseDto(holidayPay);
+    }
+
+    private HolidayPayResponseDto calculateHolidayPayByDates(double averageSalary,
                                                      LocalDate holidayStartDate,
-                                                     LocalDate holidayEndDate) {
-        if (averageSalary < 0 || holidayStartDate == null || holidayEndDate == null ||
+                                                     LocalDate holidayEndDate,
+                                                     boolean isThereFiveWorkingDays) {
+        if (averageSalary <= 0 || holidayStartDate == null || holidayEndDate == null ||
                 holidayStartDate.isAfter(holidayEndDate)) {
             return null;
         }
@@ -23,8 +34,9 @@ public class HolidayPayCalculatorService {
         int holidayDays = (int) ChronoUnit.DAYS.between(holidayStartDate, holidayEndDate) + 1;
         LocalDate currentDate = holidayStartDate.minusYears(1);
 
+        int dayOfWeek = isThereFiveWorkingDays ? 6 : 7;
         while (!currentDate.isAfter(holidayStartDate)) {
-            if (currentDate.getDayOfWeek().getValue() < 7) {
+            if (currentDate.getDayOfWeek().getValue() < dayOfWeek) {
                 workingDays++;
             }
             currentDate = currentDate.plusDays(1);
@@ -33,5 +45,19 @@ public class HolidayPayCalculatorService {
         double holidayPay = Math.round((averageSalary * 12 / workingDays * holidayDays) * 100.0) / 100.0;
 
         return new HolidayPayResponseDto(holidayPay);
+    }
+
+    public HolidayPayResponseDto calculateHolidayPay(double averageSalary, int holidayDaysNumber,
+                                                     LocalDate holidayStartDate, LocalDate holidayEndDate,
+                                                     boolean isThereFiveWorkingDays) {
+        HolidayPayResponseDto holidayPayResponseDto;
+        if (holidayStartDate == null || holidayEndDate == null) {
+            holidayPayResponseDto = calculateHolidayPayByDaysNumber(
+                    averageSalary, holidayDaysNumber);
+        } else {
+            holidayPayResponseDto = calculateHolidayPayByDates(
+                    averageSalary, holidayStartDate, holidayEndDate, isThereFiveWorkingDays);
+        }
+        return holidayPayResponseDto;
     }
 }
